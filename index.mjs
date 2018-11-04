@@ -14,7 +14,7 @@ let app = express();
 app.server = http.createServer(app);
 
 // logger
-app.use(morgan("dev"));
+app.use(morgan(process.env.NODE_ENV === "production" ? "tiny" : "dev"));
 
 // 3rd party middleware
 app.use(
