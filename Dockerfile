@@ -1,5 +1,7 @@
 FROM node:latest
 ENV NODE_ENV="production"
+ENV PORT="80"
+ENV CHEVERETO_DB_PREFIX="chv_"
 
 WORKDIR /app
 
@@ -11,7 +13,6 @@ COPY api api
 COPY model model
 COPY ./*.mjs ./
 
-ENV PORT=80
 EXPOSE 80
 
 CMD [ "npm", "start" ]
