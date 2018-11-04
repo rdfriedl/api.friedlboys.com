@@ -1,7 +1,6 @@
 FROM node:latest
 ENV NODE_ENV="production"
 ENV PORT="80"
-ENV CHEVERETO_DB_PREFIX="chv_"
 
 WORKDIR /app
 
