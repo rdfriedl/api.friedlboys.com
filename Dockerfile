@@ -1,17 +1,24 @@
+# copied from https://github.com/BretFisher/node-docker-good-defaults/blob/master/Dockerfile
+
 FROM node:latest
-ENV NODE_ENV="production"
-ENV PORT=80
 
-WORKDIR /app
+ARG NODE_ENV=production
+ENV NODE_ENV $NODE_ENV
 
-COPY package*.json ./
+ARG PORT=3000
+ENV PORT $PORT
+EXPOSE $PORT
 
-RUN npm install
+RUN npm i npm@latest -g
 
-COPY api api
-COPY model model
-COPY ./*.mjs ./
+WORKDIR /opt
+COPY package.json package-lock.json* ./
+RUN npm install --no-optional && npm cache clean --force
+ENV PATH /opt/node_modules/.bin:$PATH
 
-EXPOSE 80
+HEALTHCHECK --interval=30s CMD node healthcheck.js
 
-CMD [ "npm", "start" ]
+WORKDIR /opt/app
+COPY . /opt/app
+
+CMD [ "node", "--experimental-modules", "./index.mjs" ]

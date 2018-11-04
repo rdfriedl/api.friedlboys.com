@@ -29,6 +29,10 @@ app.use(bodyParser.json());
 initializeDb().then(db => {
 	let model = createModel(db);
 
+	app.get("/health", (req, res) => {
+		res.send("I am happy and healthy\n");
+	});
+
 	app.use((req, res, next) => {
 		req.db = db;
 		req.model = model;

@@ -1,0 +1,68 @@
+version: '3.1'
+
+volumes:
+  db:
+  images:
+  notused:
+
+services:
+  node:
+    build:
+      context: .
+      args:
+      - NODE_ENV=development
+    # you can use legacy debug config or new inspect
+    # NOTE: if nodemon isn't restarting on changes, you might be on Windows
+    # which has trouble seeing file changes, so add -L to use legacy polling
+    # https://github.com/remy/nodemon#application-isnt-restarting
+    #command: ../node_modules/.bin/nodemon --debug=0.0.0.0:5858
+    command: ../node_modules/.bin/nodemon --inspect=0.0.0.0:9229 --exec "node --experimental-modules index.mjs"
+    ports:
+    - 3000:3000
+    - 9229:9229
+    - 9230:9230
+    volumes:
+    - .:/opt/app:delegated
+    # bind-mounting these two files in will let you add packages during development without rebuilding
+    # for example, to add bower to your app while developing, just install it inside the container
+    # and then nodemon will restart. Your changes will last until you "docker-compose down" and will
+    # be saved on host for next build
+    # docker-compose exec node npm install --save bower
+    - ./package.json:/opt/package.json
+    - ./package-lock.json:/opt/package-lock.json
+    # this is a workaround to prevent host node_modules from accidently getting mounted in container
+    # in case you want to use node/npm both outside container for test/lint etc. and also inside container
+    # this will overwrite the default node_modules dir in container so it won't conflict with our
+    # /opt/node_modules location. Thanks to PR from @brnluiz
+    - notused:/opt/app/node_modules
+    depends_on:
+    - db
+    - chevereto
+    environment:
+      NODE_ENV: development
+      CHEVERETO_DB_URL: mysql://root:example@db/chevereto
+      CHEVERETO_DB_PREFIX: chv_
+
+  db:
+    image: mariadb:latest
+    volumes:
+    - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: chevereto
+
+  chevereto:
+    image: rdfriedl/docker-chevereto:latest
+    depends_on:
+    - db
+    ports:
+    - 8080:80
+    volumes:
+    - images:/var/www/html/images
+    command: bash -c "chown www-data:www-data /var/www/html/images && apache2-foreground"
+    environment:
+      CHEVERETO_DB_HOST: db
+      CHEVERETO_DB_USERNAME: root
+      CHEVERETO_DB_PASSWORD: example
+      CHEVERETO_DB_NAME: chevereto
+      CHEVERETO_DB_PREFIX: chv_
