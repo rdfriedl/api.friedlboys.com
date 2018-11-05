@@ -2,7 +2,7 @@
 	"name": "api.friedlboys.com",
 	"version": "0.1.0",
 	"description": "",
-	"main": "index.mjs",
+	"main": "app.mjs",
 	"scripts": {
 		"dev": "nodemon -w api,model --exec \"npm start\"",
 		"start": "node --experimental-modules index.mjs",
@@ -16,6 +16,7 @@
 		"cors": "^2.8.4",
 		"dotenv": "^6.1.0",
 		"express": "^4.16.4",
+		"hashids": "^1.2.2",
 		"husky": "^1.1.2",
 		"morgan": "^1.9.1",
 		"mysql": "^2.16.0",

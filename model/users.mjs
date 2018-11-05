@@ -1,4 +1,4 @@
-import { getTableName, removePropertyPrefix } from "../utils.mjs";
+import { getTableName, removePropertyPrefix } from "../utils/utils.mjs";
 
 const REMOVE_FIELDS = [];
 function createUserObject(userData) {

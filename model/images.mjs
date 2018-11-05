@@ -1,7 +1,7 @@
-import { getTableName, removePropertyPrefix } from "../utils.mjs";
+import { getTableName, removePropertyPrefix } from "../utils/utils.mjs";
 
 const REMOVE_FIELDS = [];
-function createUserObject(imageData) {
+function createImageObject(imageData) {
 	let image = removePropertyPrefix(imageData, "image_");
 
 	for (let field in REMOVE_FIELDS) {
@@ -23,11 +23,11 @@ export default db => ({
 					`SELECT * FROM ${getTableName("images")} WHERE ${props}`,
 					Object.values(query)
 				)
-				.then(images => images.map(createUserObject));
+				.then(images => images.map(createImageObject));
 		}
 
 		return db
 			.query(`SELECT * FROM ${getTableName("images")}`)
-			.then(images => images.map(createUserObject));
+			.then(images => images.map(createImageObject));
 	}
 });

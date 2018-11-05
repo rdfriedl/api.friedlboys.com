@@ -1,7 +1,7 @@
-import { getTableName, removePropertyPrefix } from "../utils.mjs";
+import { getTableName, removePropertyPrefix } from "../utils/utils.mjs";
 
 const REMOVE_FIELDS = [];
-function createUserObject(albumData) {
+function createAlbumObject(albumData) {
 	let album = removePropertyPrefix(albumData, "album_");
 
 	for (let field in REMOVE_FIELDS) {
@@ -23,11 +23,11 @@ export default db => ({
 					`SELECT * FROM ${getTableName("albums")} WHERE ${props}`,
 					Object.values(query)
 				)
-				.then(albums => albums.map(createUserObject));
+				.then(albums => albums.map(createAlbumObject));
 		}
 
 		return db
 			.query(`SELECT * FROM ${getTableName("albums")}`)
-			.then(albums => albums.map(createUserObject));
+			.then(albums => albums.map(createAlbumObject));
 	}
 });
