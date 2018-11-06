@@ -9,6 +9,7 @@
 		"format": "prettier --write **/*.{mjs,json,md}"
 	},
 	"author": "Robert Friedl (rdfriedl@gmail.com)",
+	"repository": "rdfriedl/chevereto-api",
 	"license": "ISC",
 	"dependencies": {
 		"body-parser": "^1.18.3",
