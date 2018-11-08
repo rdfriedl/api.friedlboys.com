@@ -1,7 +1,10 @@
-import { getTableName, removePropertyPrefix } from "../utils/utils.mjs";
+import mysql from "mysql";
+import { getConn } from "../lib/db.mjs";
+import { getTableName, removePropertyPrefix } from "./utils/index";
 
 const REMOVE_FIELDS = [];
-function createUserObject(settingData) {
+
+function createSettingObject(settingData) {
 	let setting = removePropertyPrefix(settingData, "setting_");
 
 	for (let field in REMOVE_FIELDS) {
@@ -11,23 +14,23 @@ function createUserObject(settingData) {
 	return setting;
 }
 
-export default db => ({
-	find(query = {}) {
-		if (Object.keys(query).length) {
-			let props = Object.keys(query)
-				.map(key => `setting_${key}=?`)
-				.join(" AND ");
+export async function find(query = {}) {
+	let db = await getConn();
 
-			return db
-				.query(
-					`SELECT * FROM ${getTableName("settings")} WHERE ${props}`,
-					Object.values(query)
-				)
-				.then(settings => settings.map(createUserObject));
-		}
+	let queryString = `SELECT * FROM ${getTableName("settings")}`;
 
-		return db
-			.query(`SELECT * FROM ${getTableName("settings")}`)
-			.then(settings => settings.map(createUserObject));
+	if (Object.keys(query).length) {
+		let props = Object.keys(query)
+			.map(key => `setting_${key}=?`)
+			.join(" AND ");
+
+		queryString = mysql.format(
+			`SELECT * FROM ${getTableName("settings")} WHERE ${props}`,
+			Object.values(query)
+		);
 	}
-});
+
+	let settings = await db.query(queryString);
+
+	return settings.map(createSettingObject);
+}

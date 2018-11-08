@@ -1,13 +1,13 @@
-import imagesModel from "./images.mjs";
-import albumsModel from "./albums.mjs";
-import usersModel from "./users.mjs";
-import settingsModel from "./settings.mjs";
+import * as images from "./images.mjs";
+import * as albums from "./albums.mjs";
+import * as users from "./users.mjs";
+import * as settings from "./settings.mjs";
 
-export function createModel(db) {
-	return {
-		images: imagesModel(db),
-		albums: albumsModel(db),
-		users: usersModel(db),
-		settings: settingsModel(db)
-	};
-}
+const model = {
+	images,
+	albums,
+	users,
+	settings
+};
+
+export default model;

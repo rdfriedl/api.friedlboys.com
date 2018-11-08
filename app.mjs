@@ -4,10 +4,8 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import bodyParser from "body-parser";
-import initializeDb from "./db";
-import createIds from "./ids";
+import { getConn } from "./lib/db";
 import api from "./api";
-import { createModel } from "./model/index.mjs";
 
 dotenv.config();
 
@@ -28,19 +26,17 @@ app.use(bodyParser.json());
 
 // connect to db
 export default async function init() {
-	let db = await initializeDb();
-	let model = createModel(db);
-	let ids = await createIds(model);
-
 	app.get("/health", (req, res) => {
 		res.send("I am happy and healthy\n");
 	});
 
 	app.use((req, res, next) => {
-		req.db = db;
-		req.model = model;
-		req.ids = ids;
-		next();
+		getConn()
+			.then(db => {
+				req.db = db;
+				next();
+			})
+			.catch(next);
 	});
 
 	// api router

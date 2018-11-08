@@ -1,6 +1,14 @@
-import { getTableName, removePropertyPrefix } from "../utils/utils.mjs";
+import mysql from "mysql";
+import { getConn } from "../lib/db.mjs";
+import {
+	convertIdFields,
+	getTableName,
+	removePropertyPrefix
+} from "./utils/index";
 
 const REMOVE_FIELDS = [];
+const ID_FIELDS = ["user_id", "id"];
+
 function createAlbumObject(albumData) {
 	let album = removePropertyPrefix(albumData, "album_");
 
@@ -8,26 +16,28 @@ function createAlbumObject(albumData) {
 		delete album[field];
 	}
 
-	return album;
+	return convertIdFields(album, ID_FIELDS);
 }
 
-export default db => ({
-	find(query = {}) {
-		if (Object.keys(query).length) {
-			let props = Object.keys(query)
-				.map(key => `album_${key}=?`)
-				.join(" AND ");
+export async function find(query = {}) {
+	let db = await getConn();
 
-			return db
-				.query(
-					`SELECT * FROM ${getTableName("albums")} WHERE ${props}`,
-					Object.values(query)
-				)
-				.then(albums => albums.map(createAlbumObject));
-		}
+	let queryString = `SELECT * FROM ${getTableName("albums")}`;
 
-		return db
-			.query(`SELECT * FROM ${getTableName("albums")}`)
-			.then(albums => albums.map(createAlbumObject));
+	if (Object.keys(query).length) {
+		let parsedQuery = convertIdFields(query, ID_FIELDS);
+		let props = Object.keys(parsedQuery)
+			.map(key => `album_${key}=?`)
+			.join(" AND ");
+
+		queryString = mysql.format(
+			`SELECT * FROM ${getTableName("albums")} WHERE ${props}`,
+			Object.values(parsedQuery)
+		);
 	}
-});
+
+	let albums = await db.query(queryString);
+
+	return albums.map(createAlbumObject);
+}
+7;

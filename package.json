@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "app.mjs",
 	"scripts": {
-		"dev": "nodemon -w api,model --exec \"npm start\"",
+		"dev": "nodemon --experimental-modules index.mjs",
 		"start": "node --experimental-modules index.mjs",
 		"format": "prettier --write **/*.{mjs,json,md}"
 	},

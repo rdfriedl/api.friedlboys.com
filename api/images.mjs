@@ -1,30 +1,24 @@
 import express from "express";
-import { removePropertyPrefix, wrap } from "../utils/utils.mjs";
+import { wrap } from "../lib/utils";
+import model from "../model";
 
 let routes = express.Router();
 
 routes.get(
 	"/",
 	wrap(async req => {
-		let images = await req.model.images.find(req.query);
-
-		images.forEach(image => (image.id = req.ids.encode(image.id)));
-
-		return images.map(image => removePropertyPrefix(image, "image_"));
+		return await model.images.find(req.query);
 	})
 );
 
 routes.get(
 	"/:id",
 	wrap(async req => {
-		let imageId = req.ids.decode(req.params.id);
-		let image = await req.model.images.find({ id: imageId })[0];
+		let image = await model.images.find({ id: req.params.id })[0];
 
 		if (!image) {
 			throw new Error(`image ${req.params.id} dose not exist`);
 		}
-
-		image.id = req.ids.encode(image.id);
 
 		return image;
 	})

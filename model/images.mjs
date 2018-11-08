@@ -1,6 +1,14 @@
-import { getTableName, removePropertyPrefix } from "../utils/utils.mjs";
+import mysql from "mysql";
+import { getConn } from "../lib/db.mjs";
+import {
+	convertIdFields,
+	getTableName,
+	removePropertyPrefix
+} from "./utils/index";
 
 const REMOVE_FIELDS = [];
+const ID_FIELDS = ["user_id", "album_id", "id"];
+
 function createImageObject(imageData) {
 	let image = removePropertyPrefix(imageData, "image_");
 
@@ -8,26 +16,27 @@ function createImageObject(imageData) {
 		delete image[field];
 	}
 
-	return image;
+	return convertIdFields(image, ID_FIELDS);
 }
 
-export default db => ({
-	find(query = {}) {
-		if (Object.keys(query).length) {
-			let props = Object.keys(query)
-				.map(key => `image_${key}=?`)
-				.join(" AND ");
+export async function find(query = {}) {
+	let db = await getConn();
 
-			return db
-				.query(
-					`SELECT * FROM ${getTableName("images")} WHERE ${props}`,
-					Object.values(query)
-				)
-				.then(images => images.map(createImageObject));
-		}
+	let queryString = `SELECT * FROM ${getTableName("images")}`;
 
-		return db
-			.query(`SELECT * FROM ${getTableName("images")}`)
-			.then(images => images.map(createImageObject));
+	if (Object.keys(query).length) {
+		let parsedQuery = convertIdFields(query, ID_FIELDS);
+		let props = Object.keys(parsedQuery)
+			.map(key => `image_${key}=?`)
+			.join(" AND ");
+
+		queryString = mysql.format(
+			`SELECT * FROM ${getTableName("images")} WHERE ${props}`,
+			Object.values(parsedQuery)
+		);
 	}
-});
+
+	let images = await db.query(queryString);
+
+	return images.map(createImageObject);
+}
