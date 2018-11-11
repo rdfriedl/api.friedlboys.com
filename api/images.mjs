@@ -14,13 +14,13 @@ routes.get(
 routes.get(
 	"/:id",
 	wrap(async req => {
-		let image = await model.images.find({ id: req.params.id })[0];
+		let images = await model.images.find({ id: req.params.id });
 
-		if (!image) {
+		if (images.length === 0) {
 			throw new Error(`image ${req.params.id} dose not exist`);
 		}
 
-		return image;
+		return images[0];
 	})
 );
 

@@ -14,13 +14,13 @@ routes.get(
 routes.get(
 	"/:id",
 	wrap(async req => {
-		let album = await model.albums.find({ id: req.params.id })[0];
+		let albums = await model.albums.find({ id: req.params.id });
 
-		if (!album) {
+		if (albums.length === 0) {
 			throw new Error(`album ${req.params.id} dose not exist`);
 		}
 
-		return album;
+		return albums[0];
 	})
 );
 
