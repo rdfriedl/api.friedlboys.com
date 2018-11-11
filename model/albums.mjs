@@ -6,6 +6,7 @@ import {
 	removePropertyPrefix
 } from "./utils/index";
 
+const DEFAULT_QUERY = {};
 const REMOVE_FIELDS = [];
 const ID_FIELDS = ["user_id", "id"];
 
@@ -21,11 +22,12 @@ function createAlbumObject(albumData) {
 
 export async function find(query = {}) {
 	let db = await getConn();
+	let parsedQuery = Object.assign({}, DEFAULT_QUERY, query);
 
 	let queryString = `SELECT * FROM ${getTableName("albums")}`;
 
-	if (Object.keys(query).length) {
-		let parsedQuery = convertIdFields(query, ID_FIELDS);
+	if (Object.keys(parsedQuery).length) {
+		let parsedQuery = convertIdFields(parsedQuery, ID_FIELDS);
 		let props = Object.keys(parsedQuery)
 			.map(key => `album_${key}=?`)
 			.join(" AND ");

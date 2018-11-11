@@ -6,7 +6,10 @@ import {
 	removePropertyPrefix
 } from "./utils/index";
 
-const REMOVE_FIELDS = [];
+const DEFAULT_QUERY = {
+	is_private: 0
+};
+const REMOVE_FIELDS = ["password", "email"];
 const ID_FIELDS = ["user_id", "id"];
 
 function createUserObject(userData) {
@@ -21,11 +24,12 @@ function createUserObject(userData) {
 
 export async function find(query = {}) {
 	let db = await getConn();
+	let parsedQuery = Object.assign({}, DEFAULT_QUERY, query);
 
 	let queryString = `SELECT * FROM ${getTableName("users")}`;
 
-	if (Object.keys(query).length) {
-		let parsedQuery = convertIdFields(query, ID_FIELDS);
+	if (Object.keys(parsedQuery).length) {
+		parsedQuery = convertIdFields(parsedQuery, ID_FIELDS);
 		let props = Object.keys(parsedQuery)
 			.map(key => `user_${key}=?`)
 			.join(" AND ");
