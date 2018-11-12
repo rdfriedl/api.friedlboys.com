@@ -23,11 +23,11 @@ function createAlbumObject(albumData) {
 export async function find(query = {}) {
 	let db = await getConn();
 	let parsedQuery = Object.assign({}, DEFAULT_QUERY, query);
+	parsedQuery = convertIdFields(parsedQuery, ID_FIELDS);
 
 	let queryString = `SELECT * FROM ${getTableName("albums")}`;
 
 	if (Object.keys(parsedQuery).length) {
-		let parsedQuery = convertIdFields(parsedQuery, ID_FIELDS);
 		let props = Object.keys(parsedQuery)
 			.map(key => `album_${key}=?`)
 			.join(" AND ");

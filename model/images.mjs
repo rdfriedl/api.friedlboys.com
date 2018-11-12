@@ -23,11 +23,11 @@ function createImageObject(imageData) {
 export async function find(query = {}) {
 	let db = await getConn();
 	let parsedQuery = Object.assign({}, DEFAULT_QUERY, query);
+	parsedQuery = convertIdFields(parsedQuery, ID_FIELDS);
 
 	let queryString = `SELECT * FROM ${getTableName("images")}`;
 
 	if (Object.keys(parsedQuery).length) {
-		let parsedQuery = convertIdFields(parsedQuery, ID_FIELDS);
 		let props = Object.keys(parsedQuery)
 			.map(key => `image_${key}=?`)
 			.join(" AND ");

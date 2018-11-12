@@ -25,11 +25,11 @@ function createUserObject(userData) {
 export async function find(query = {}) {
 	let db = await getConn();
 	let parsedQuery = Object.assign({}, DEFAULT_QUERY, query);
+	parsedQuery = convertIdFields(parsedQuery, ID_FIELDS);
 
 	let queryString = `SELECT * FROM ${getTableName("users")}`;
 
 	if (Object.keys(parsedQuery).length) {
-		parsedQuery = convertIdFields(parsedQuery, ID_FIELDS);
 		let props = Object.keys(parsedQuery)
 			.map(key => `user_${key}=?`)
 			.join(" AND ");

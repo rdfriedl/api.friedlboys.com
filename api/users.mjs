@@ -13,11 +13,11 @@ routes.get(
 
 routes.get(
 	"/:id",
-	wrap(async req => {
+	wrap(async (req, res) => {
 		let users = await model.users.find({ id: req.params.id });
 
 		if (users.length === 0) {
-			throw new Error(`user ${req.params.id} dose not exist`);
+			res.status(404).end();
 		}
 
 		return users[0];
