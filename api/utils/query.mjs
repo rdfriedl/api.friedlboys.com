@@ -1,5 +1,27 @@
 import * as ids from "./ids";
 
+function setValue(obj = {}, path = [], value) {
+	let prop = path.shift();
+
+	if (path.length === 0) {
+		return (obj[prop] = value);
+	}
+
+	if (!obj[prop]) {
+		obj[prop] = {};
+	}
+	return setValue(obj[prop], path, value);
+}
+export function expandQuery(query = {}) {
+	let newQuery = {};
+
+	for (let path in query) {
+		setValue(newQuery, path.split("."), query[path]);
+	}
+
+	return newQuery;
+}
+
 export function parseFieldValue(value) {
 	if (Array.isArray(value)) {
 		return value.map(parseField);
@@ -16,33 +38,70 @@ export function parseFieldValue(value) {
 	return value;
 }
 
+export async function convertIdFields(where = {}, ID_FIELDS = []) {
+	let newObj = {};
+
+	for (let field of ID_FIELDS) {
+		if (!where.hasOwnProperty(field)) continue;
+
+		newObj[field] = parseFieldValue(where[field]);
+
+		if (Array.isArray(newObj[field])) {
+			newObj[field] = await Promise.all(
+				newObj[field].map(val => ids.decode(val))
+			);
+		} else if (typeof newObj[field] === "string") {
+			let original = newObj[field];
+			newObj[field] = await ids.decode(newObj[field]);
+
+			if (isNaN(newObj[field])) {
+				// reset the field if it failed to parse the id
+				newObj[field] = original;
+			}
+		}
+	}
+
+	return newObj;
+}
+
 export async function parseQuery(query = {}, ID_FIELDS = []) {
-	let newQuery = {};
+	let where = Object.assign({}, query.where || {});
+	let order = parseFieldValue(query.order);
+	let offset = parseFieldValue(query.offset);
+	let limit = parseFieldValue(query.limit);
+
+	if (order && !Array.isArray(order)) {
+		order = [order];
+	}
+
+	order = order
+		.map(value => {
+			if (typeof value === "string") {
+				if (value.indexOf("-") === 0) {
+					return [value.substring(1, value.length), "DESC"];
+				} else return value;
+			}
+		})
+		.filter(Boolean);
 
 	// parse values
-	for (let key in query) {
-		if (!query.hasOwnProperty(key)) continue;
+	for (let key in where) {
+		if (!where.hasOwnProperty(key)) continue;
 
-		newQuery[key] = parseFieldValue(query[key]);
+		where[key] = parseFieldValue(where[key]);
 	}
 
 	// convert ids
-	for (let field of ID_FIELDS) {
-		if (!newQuery.hasOwnProperty(field)) continue;
+	where = await convertIdFields(where, ID_FIELDS);
 
-		if (Array.isArray(newQuery[field])) {
-			newQuery[field] = await Promise.all(
-				newQuery[field].map(val => ids.decode(val))
-			);
-		} else if (typeof newQuery[field] === "string") {
-			newQuery[field] = await ids.decode(newQuery[field]);
-		}
+	return {
+		where,
+		order,
+		offset,
+		limit
+	};
+}
 
-		if(isNaN(newQuery[field])){
-			// reset the field if it failed to parse the id
-			newQuery[field] = parseFieldValue(query[field]);
-		}
-	}
-
-	return newQuery;
+export function getSequelizeQuery(query = {}, ID_FIELDS = []) {
+	return parseQuery(expandQuery(query), ID_FIELDS);
 }
