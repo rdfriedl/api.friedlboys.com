@@ -20,13 +20,12 @@
 		"hashids": "^1.2.2",
 		"husky": "^1.1.2",
 		"morgan": "^1.9.1",
-		"mysql": "^2.16.0",
-		"prettier": "^1.14.3",
-		"promise-mysql": "^3.3.1",
-		"resource-router-middleware": "^0.7.0"
+		"mysql2": "^1.6.4",
+		"sequelize": "^4.41.2"
 	},
 	"devDependencies": {
-		"nodemon": "^1.18.5"
+		"nodemon": "^1.18.5",
+		"prettier": "^1.15.2"
 	},
 	"prettier": {
 		"useTabs": true,

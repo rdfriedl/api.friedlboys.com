@@ -1,4 +1,4 @@
-import { encode, decode } from "../../lib/ids.mjs";
+import { encode, decode } from "../../api/utils/ids.mjs";
 
 export function convertIdFields(obj, fields = ["id"]) {
 	let copy = Object.assign({}, obj);

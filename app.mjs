@@ -4,7 +4,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import bodyParser from "body-parser";
-import { getConn } from "./lib/db";
+// import { getConn } from "./lib/db";
 import api from "./api";
 
 dotenv.config();
@@ -13,7 +13,16 @@ let app = express();
 app.server = http.createServer(app);
 
 // logger
-app.use(morgan(process.env.NODE_ENV === "production" ? "tiny" : "dev"));
+app.use(
+	morgan(process.env.NODE_ENV === "production" ? "tiny" : "dev", {
+		skip(req, res) {
+			return (
+				(process.env.NODE_ENV === "production" && res.statusCode < 400) ||
+				req.path === "/health"
+			);
+		}
+	})
+);
 
 // 3rd party middleware
 app.use(
@@ -30,14 +39,14 @@ export default async function init() {
 		res.send("I am happy and healthy\n");
 	});
 
-	app.use((req, res, next) => {
-		getConn()
-			.then(db => {
-				req.db = db;
-				next();
-			})
-			.catch(next);
-	});
+	// app.use((req, res, next) => {
+	// 	getConn()
+	// 		.then(db => {
+	// 			req.db = db;
+	// 			next();
+	// 		})
+	// 		.catch(next);
+	// });
 
 	// api router
 	app.use(api);

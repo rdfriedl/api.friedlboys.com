@@ -1,26 +1,31 @@
 import express from "express";
-import { wrap } from "../lib/utils";
-import model from "../model";
+import { wrap, parseQuery, processResults } from "./utils";
+import Image from "../model/Image";
+import Album from "../model/Album";
 
 let routes = express.Router();
+
+let ID_FIELDS = ["id", "user_id", "album_id"];
 
 routes.get(
 	"/",
 	wrap(async req => {
-		return await model.images.find(req.query);
+		let where = await parseQuery(req.query, ID_FIELDS);
+
+		let images = await Image.findAll({ where });
+
+		return processResults(images, ID_FIELDS);
 	})
 );
 
 routes.get(
 	"/:id",
-	wrap(async (req, res) => {
-		let images = await model.images.find({ id: req.params.id });
+	wrap(async req => {
+		let where = parseQuery(req.params);
 
-		if (images.length === 0) {
-			res.status(404).end();
-		}
+		let results = await Album.findAll({ where });
 
-		return images[0];
+		return processResults(results, ID_FIELDS);
 	})
 );
 

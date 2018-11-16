@@ -1,12 +1,12 @@
-import * as images from "./images.mjs";
-import * as albums from "./albums.mjs";
-import * as users from "./users.mjs";
-import * as settings from "./settings.mjs";
+import * as images from "./Image.mjs";
+// import * as albums from "./Album.mjs";
+// import * as users from "./User.mjs";
+import * as settings from "./Setting.mjs";
 
 const model = {
 	images,
-	albums,
-	users,
+	// albums,
+	// users,
 	settings
 };
 
