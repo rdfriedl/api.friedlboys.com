@@ -71,7 +71,7 @@ export async function parseQuery(query = {}, ID_FIELDS = []) {
 	let limit = parseFieldValue(query.limit);
 
 	if (order) {
-		if(!Array.isArray(order)){
+		if (!Array.isArray(order)) {
 			order = [order];
 		}
 

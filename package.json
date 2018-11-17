@@ -8,24 +8,30 @@
 		"start": "node --experimental-modules index.mjs",
 		"format": "prettier --write **/*.{mjs,json,md}"
 	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "pretty-quick --staged"
+		}
+	},
 	"author": "Robert Friedl (rdfriedl@gmail.com)",
 	"repository": "rdfriedl/chevereto-api",
 	"license": "ISC",
 	"dependencies": {
 		"body-parser": "^1.18.3",
 		"compression": "^1.7.3",
-		"cors": "^2.8.4",
+		"cors": "^2.8.5",
 		"dotenv": "^6.1.0",
 		"express": "^4.16.4",
 		"hashids": "^1.2.2",
-		"husky": "^1.1.2",
 		"morgan": "^1.9.1",
 		"mysql2": "^1.6.4",
 		"sequelize": "^4.41.2"
 	},
 	"devDependencies": {
-		"nodemon": "^1.18.5",
-		"prettier": "^1.15.2"
+		"husky": "^1.1.4",
+		"nodemon": "^1.18.6",
+		"prettier": "^1.15.2",
+		"pretty-quick": "^1.8.0"
 	},
 	"prettier": {
 		"useTabs": true,
