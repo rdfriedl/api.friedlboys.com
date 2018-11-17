@@ -24,7 +24,7 @@ export function expandQuery(query = {}) {
 
 export function parseFieldValue(value) {
 	if (Array.isArray(value)) {
-		return value.map(parseField);
+		return value.map(parseFieldValue);
 	} else if (Number.isFinite(parseFloat(value))) {
 		return parseFloat(value);
 	} else if (value === "null") {
