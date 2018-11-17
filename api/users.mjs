@@ -4,7 +4,7 @@ import User from "../model/User";
 
 let routes = express.Router();
 
-let ID_FIELDS = ["id", "user_id"];
+let ID_FIELDS = ["id"];
 
 routes.get(
 	"/",
@@ -25,7 +25,7 @@ routes.get(
 			ID_FIELDS
 		);
 
-		let results = await User.findAll(query);
+		let results = await User.findOne(query);
 
 		return processResults(results, ID_FIELDS);
 	})

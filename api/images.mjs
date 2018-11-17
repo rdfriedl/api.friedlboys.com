@@ -4,7 +4,7 @@ import Image from "../model/Image";
 
 let routes = express.Router();
 
-let ID_FIELDS = ["id", "user_id"];
+let ID_FIELDS = ["id", "user_id", "album_id"];
 
 routes.get(
 	"/",
@@ -25,7 +25,7 @@ routes.get(
 			ID_FIELDS
 		);
 
-		let results = await Image.findAll(query);
+		let results = await Image.findOne(query);
 
 		return processResults(results, ID_FIELDS);
 	})

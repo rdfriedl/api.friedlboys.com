@@ -25,7 +25,7 @@ routes.get(
 			ID_FIELDS
 		);
 
-		let results = await Album.findAll(query);
+		let results = await Album.findOne(query);
 
 		return processResults(results, ID_FIELDS);
 	})

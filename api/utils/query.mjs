@@ -70,19 +70,21 @@ export async function parseQuery(query = {}, ID_FIELDS = []) {
 	let offset = parseFieldValue(query.offset);
 	let limit = parseFieldValue(query.limit);
 
-	if (order && !Array.isArray(order)) {
-		order = [order];
-	}
+	if (order) {
+		if(!Array.isArray(order)){
+			order = [order];
+		}
 
-	order = order
-		.map(value => {
-			if (typeof value === "string") {
-				if (value.indexOf("-") === 0) {
-					return [value.substring(1, value.length), "DESC"];
-				} else return value;
-			}
-		})
-		.filter(Boolean);
+		order = order
+			.map(value => {
+				if (typeof value === "string") {
+					if (value.indexOf("-") === 0) {
+						return [value.substring(1, value.length), "DESC"];
+					} else return value;
+				}
+			})
+			.filter(Boolean);
+	}
 
 	// parse values
 	for (let key in where) {
@@ -92,7 +94,8 @@ export async function parseQuery(query = {}, ID_FIELDS = []) {
 	}
 
 	// convert ids
-	where = await convertIdFields(where, ID_FIELDS);
+	let idFields = await convertIdFields(where, ID_FIELDS);
+	Object.assign(where, idFields);
 
 	return {
 		where,
